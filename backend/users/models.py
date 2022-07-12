@@ -51,10 +51,21 @@ class User(AbstractBaseUser, PermissionsMixin):
         max_length=150,
         unique=True,
         validators=[username_validator],
+        verbose_name='Имя пользователя',
     )
-    email = models.EmailField(unique=True, max_length=254)
-    first_name = models.CharField(max_length=150, null=True, blank=True)
-    last_name = models.CharField(max_length=150, null=True, blank=True)
+    email = models.EmailField(
+        unique=True,
+        max_length=254,
+        verbose_name='"Электронная почта',
+    )
+    first_name = models.CharField(
+        max_length=150,
+        verbose_name='Имя'
+    )
+    last_name = models.CharField(
+        max_length=150,
+        verbose_name='Фамилия'
+    )
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
 
@@ -76,22 +87,30 @@ class User(AbstractBaseUser, PermissionsMixin):
         send_mail(subject, message, from_email, [self.email], **kwargs)
 
 
-class Subscription:
+class Subscription(models.Model):
     user = models.ForeignKey(
         User,
         related_name='follower',
+        verbose_name='Подписчик',
         on_delete=models.CASCADE,
     )
     author = models.ForeignKey(
         User,
         related_name='following',
+        verbose_name='Автор',
         on_delete=models.CASCADE,
     )
 
     class Meta:
+        verbose_name = 'Подписка'
+        verbose_name_plural = 'Подписки'
+        ordering = ['user']
         constraints = [
             models.UniqueConstraint(
                 name='unique_follow',
                 fields=['user', 'author']
             )
         ]
+
+    def __str__(self):
+        return self.user.username
