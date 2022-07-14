@@ -4,7 +4,7 @@ from django.contrib.auth.password_validation import validate_password
 from django.core import exceptions as django_exceptions
 from djoser.serializers import UserCreateSerializer
 
-from recipes.models import Tag
+from recipes.models import Tag, Ingredient
 
 User = get_user_model()
 
@@ -13,6 +13,16 @@ class TagSerializer(serializers.ModelSerializer):
     class Meta:
         model = Tag
         fields = ['id', 'name', 'color', 'slug']
+
+
+class IngredientSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Ingredient
+        fields = ['name', 'measurement_unit']
+
+
+class RecipeSerializer(serializers.ModelSerializer):
+    pass
 
 
 class UserSerializer(serializers.ModelSerializer):
