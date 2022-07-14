@@ -1,7 +1,9 @@
-
+from django.contrib.auth import get_user_model
 from django.contrib import admin
 
-from .models import User, Subscription
+from .models import Subscription
+
+User = get_user_model()
 
 
 class SubscriptionInLine(admin.TabularInline):
