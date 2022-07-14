@@ -1,10 +1,10 @@
 from django.contrib import admin
 
-from .models import Recipe, Tag, Ingridient, RecipeIngridient
+from .models import Recipe, Tag, Ingredient, RecipeIngredient
 
 
-class RecipeIngridientsInLine(admin.TabularInline):
-    model = RecipeIngridient
+class RecipeIngredientsInLine(admin.TabularInline):
+    model = RecipeIngredient
     extra = 1
 
 
@@ -18,15 +18,15 @@ class RecipeAdmin(admin.ModelAdmin):
     list_display = ['name', 'author']
     list_filter = ['author', 'name', 'tags']
     search_fields = ['author', 'name']
-    inlines = [RecipeIngridientsInLine]
-    readonly_fields = ['favorits_count']
+    inlines = [RecipeIngredientsInLine]
+    readonly_fields = ['favorite_count']
     # filter_horizontal = ['tags']
-    fields = ['author', 'name', 'image', 'text', 'coocking_time', 'tags',
-              'favorits_count']
+    fields = ['author', 'name', 'image', 'text', 'cooking_time', 'tags',
+              'favorite_count']
 
 
-@admin.register(Ingridient)
-class IngridientAdmin(admin.ModelAdmin):
+@admin.register(Ingredient)
+class IngredientAdmin(admin.ModelAdmin):
     list_display = ['name', 'measurement_unit']
     search_fields = ['name']
     list_filter = ['name']

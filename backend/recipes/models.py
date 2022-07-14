@@ -31,7 +31,7 @@ class Recipe(models.Model):
     """Рецепты"""
     author = models.ForeignKey(
         User,
-        related_name='recipies',
+        related_name='recipes',
         on_delete=models.CASCADE,
         verbose_name='Автор',
     )
@@ -41,26 +41,26 @@ class Recipe(models.Model):
     )
     image = models.ImageField(
         'Фото',
-        upload_to='recipies/',
+        upload_to='recipes/',
         blank=True,
     )
     text = models.TextField(verbose_name='Описание')
-    coocking_time = models.IntegerField(verbose_name='Время готовки')
+    cooking_time = models.IntegerField(verbose_name='Время готовки')
     tags = models.ManyToManyField(Tag, verbose_name='Тэг')
-    favorits = models.ManyToManyField(
-        User, related_name='favorits', blank=True)
+    favorite = models.ManyToManyField(
+        User, related_name='favorite', blank=True)
     shopping_carts = models.ManyToManyField(
         User, related_name='shopping_cart', blank=True)
 
-    def favorits_count(self):
-        return self.favorits.count()
-    favorits_count.short_description = 'Добавили в избранное'
+    def favorite_count(self):
+        return self.favorite.count()
+    favorite_count.short_description = 'Добавили в избранное'
 
     def __str__(self):
         return self.name
 
 
-class Ingridient(models.Model):
+class Ingredient(models.Model):
     """Ингридиенты и их единица измерения"""
     name = models.CharField(
         max_length=200,
@@ -75,16 +75,16 @@ class Ingridient(models.Model):
         return f'{self.name} {self.measurement_unit}'
 
 
-class RecipeIngridient(models.Model):
-    """Рецепты и ингридиенты, многие ко многим"""
+class RecipeIngredient(models.Model):
+    """Рецепты и ингредиенты, многие ко многим"""
     recipe = models.ForeignKey(
         Recipe,
-        related_name='ingridients',
+        related_name='ingredients',
         on_delete=models.CASCADE,
     )
-    ingridient = models.ForeignKey(
-        Ingridient,
-        related_name='recipies',
+    ingredient = models.ForeignKey(
+        Ingredient,
+        related_name='recipes',
         on_delete=models.CASCADE,
     )
     amount = models.IntegerField()
