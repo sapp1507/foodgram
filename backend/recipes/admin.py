@@ -1,10 +1,10 @@
 from django.contrib import admin
 
-from .models import Recipe, Tag, Ingredient, RecipeIngredient
+from .models import Recipe, Tag, Ingredient, AmountIngredient
 
 
 class RecipeIngredientsInLine(admin.TabularInline):
-    model = RecipeIngredient
+    model = AmountIngredient
     extra = 1
 
 
@@ -22,7 +22,7 @@ class RecipeAdmin(admin.ModelAdmin):
     readonly_fields = ['favorite_count']
     # filter_horizontal = ['tags']
     fields = ['author', 'name', 'image', 'text', 'cooking_time', 'tags',
-              'favorite_count']
+              'favorite_count', 'favorite', 'shopping_carts']
 
 
 @admin.register(Ingredient)

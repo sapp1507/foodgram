@@ -27,6 +27,21 @@ class Tag(models.Model):
         return self.name
 
 
+class Ingredient(models.Model):
+    """Ингридиенты и их единица измерения"""
+    name = models.CharField(
+        max_length=200,
+        verbose_name='Название',
+    )
+    measurement_unit = models.CharField(
+        max_length=200,
+        verbose_name='Ед. изм.'
+    )
+
+    def __str__(self):
+        return f'{self.name} {self.measurement_unit}'
+
+
 class Recipe(models.Model):
     """Рецепты"""
     author = models.ForeignKey(
@@ -56,26 +71,17 @@ class Recipe(models.Model):
         return self.favorite.count()
     favorite_count.short_description = 'Добавили в избранное'
 
+    def get_tags(self):
+        return self.tags.all()
+
+    def get_ingredients(self):
+        return self.ingredients.all()
+
     def __str__(self):
         return self.name
 
 
-class Ingredient(models.Model):
-    """Ингридиенты и их единица измерения"""
-    name = models.CharField(
-        max_length=200,
-        verbose_name='Название',
-    )
-    measurement_unit = models.CharField(
-        max_length=200,
-        verbose_name='Ед. изм.'
-    )
-
-    def __str__(self):
-        return f'{self.name} {self.measurement_unit}'
-
-
-class RecipeIngredient(models.Model):
+class AmountIngredient(models.Model):
     """Рецепты и ингредиенты, многие ко многим"""
     recipe = models.ForeignKey(
         Recipe,
@@ -87,4 +93,4 @@ class RecipeIngredient(models.Model):
         related_name='recipes',
         on_delete=models.CASCADE,
     )
-    amount = models.IntegerField()
+    amount = models.PositiveIntegerField()
