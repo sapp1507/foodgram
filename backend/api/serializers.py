@@ -3,9 +3,8 @@ from django.contrib.auth.password_validation import validate_password
 from django.core import exceptions as django_exceptions
 from django.shortcuts import get_object_or_404
 from djoser.serializers import UserCreateSerializer
-from rest_framework import serializers
-
 from recipes.models import AmountIngredient, Ingredient, Recipe, Tag
+from rest_framework import serializers
 
 from .utils import clear_ingredients_in_recipe
 

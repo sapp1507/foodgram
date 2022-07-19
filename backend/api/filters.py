@@ -1,7 +1,6 @@
 from django_filters import FilterSet, ModelMultipleChoiceFilter
-from rest_framework import filters
-
 from recipes.models import Tag
+from rest_framework import filters
 
 
 class IngredientSearchFilterBackend(filters.SearchFilter):
