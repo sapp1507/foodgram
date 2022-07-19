@@ -1,11 +1,12 @@
-from rest_framework import serializers
 from django.contrib.auth import get_user_model
 from django.contrib.auth.password_validation import validate_password
 from django.core import exceptions as django_exceptions
-from djoser.serializers import UserCreateSerializer
 from django.shortcuts import get_object_or_404
+from djoser.serializers import UserCreateSerializer
+from rest_framework import serializers
 
-from recipes.models import Tag, Ingredient, Recipe, AmountIngredient
+from recipes.models import AmountIngredient, Ingredient, Recipe, Tag
+
 from .utils import clear_ingredients_in_recipe
 
 User = get_user_model()
@@ -28,16 +29,6 @@ class IngredientSerializer(serializers.ModelSerializer):
 
 
 class AmountIngredientsSerializer(serializers.ModelSerializer):
-    # name = serializers.SlugRelatedField(
-    #     source='ingredient',
-    #     slug_field='name',
-    #     read_only=True
-    # )
-    # measurement_unit = serializers.SlugRelatedField(
-    #     source='ingredient',
-    #     slug_field='measurement_unit',
-    #     read_only=True
-    # )
     id = serializers.IntegerField(source='ingredient.id')
     name = serializers.CharField(source='ingredient.name')
     measurement_unit = serializers.CharField(
@@ -177,17 +168,6 @@ class AddRecipeSerializer(RecipeSerializer):
         recipe.tags.set(tags)
 
         self._create_amount_for_recipe(ingredients, recipe)
-
-        # for _ in ingredients:
-        #     ingredient = get_object_or_404(Ingredient,
-        #                                    pk=_['ingredient']['id'])
-        #     amount, created = AmountIngredient.objects.get_or_create(
-        #         recipe=recipe,
-        #         ingredient=ingredient,
-        #         amount=_['amount']
-        #     )
-        #     if created:
-        #         amount.save()
         return recipe
 
     def update(self, instance, validated_data):
@@ -201,6 +181,25 @@ class AddRecipeSerializer(RecipeSerializer):
     def to_representation(self, instance):
         serializer = RecipeSerializer(instance, context=self.context)
         return serializer.data
+
+
+class SmallRecipeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Recipe
+        fields = ['id', 'name', 'image', 'cooking_time']
+
+
+class UserRecipeSerializer(UserSerializer):
+    recipes = SmallRecipeSerializer(read_only=True, many=True)
+    recipes_count = serializers.SerializerMethodField()
+
+    class Meta:
+        model = User
+        fields = ['email', 'id', 'username', 'first_name', 'last_name',
+                  'is_subscribed', 'recipes', 'recipes_count']
+
+    def get_recipes_count(self, author):
+        return author.recipes.count()
 
 
 
