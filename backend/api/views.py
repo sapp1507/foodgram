@@ -13,12 +13,12 @@ from recipes.models import Ingredient, Recipe, Tag
 from users.models import Subscription
 
 from .filters import IngredientSearchFilterBackend, RecipeFilterSet
+from .mixins import ListViewSet
 from .paginators import PageLimitPaginator
 from .permissions import IsAuthorOrReadOnly
 from .serializers import (AddRecipeSerializer, IngredientSerializer,
                           RecipeSerializer, SmallRecipeSerializer,
-                          TagSerializer, UserSerializer, UserRecipeSerializer)
-from .mixins import ListViewSet
+                          TagSerializer, UserRecipeSerializer)
 
 User = get_user_model()
 
@@ -32,7 +32,7 @@ class TagViewSet(viewsets.ReadOnlyModelViewSet):
 class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
-    # permission_classes = [permissions.AllowAny]
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     filter_backends = [IngredientSearchFilterBackend]
     search_fields = ['^name']
     pagination_class = None
@@ -58,9 +58,9 @@ class RecipeViewSet(viewsets.ModelViewSet):
             queryset = queryset.filter(shopping_carts=self.request.user)
 
         author_id = params.get('author')
-        if author_id is not None and User.objects.filter(pk=author_id).exists():
+        if author_id is not None and User.objects.filter(
+                pk=author_id).exists():
             queryset = queryset.filter(author_id=author_id)
-
 
         return queryset
 

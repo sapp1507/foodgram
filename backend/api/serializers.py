@@ -200,8 +200,3 @@ class UserRecipeSerializer(UserSerializer):
 
     def get_recipes_count(self, author):
         return author.recipes.count()
-
-
-
-
-
