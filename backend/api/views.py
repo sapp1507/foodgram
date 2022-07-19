@@ -4,6 +4,7 @@ from django.contrib.auth import get_user_model
 from django.db.models import F
 from django.http import FileResponse
 from django.shortcuts import get_object_or_404
+from django_filters.rest_framework import DjangoFilterBackend
 from reportlab.pdfgen import canvas
 from rest_framework import permissions, status, viewsets
 from rest_framework.response import Response
@@ -11,8 +12,9 @@ from rest_framework.response import Response
 from recipes.models import Ingredient, Recipe, Tag
 from users.models import Subscription
 
-from .filters import IngredientSearchFilterBackend
+from .filters import IngredientSearchFilterBackend, RecipeFilterSet
 from .paginators import PageLimitPaginator
+from .permissions import IsAuthorOrReadOnly
 from .serializers import (AddRecipeSerializer, IngredientSerializer,
                           RecipeSerializer, SmallRecipeSerializer,
                           TagSerializer, UserSerializer, UserRecipeSerializer)
@@ -38,8 +40,29 @@ class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
 
 class RecipeViewSet(viewsets.ModelViewSet):
     queryset = Recipe.objects.all()
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    permission_classes = [IsAuthorOrReadOnly, permissions.IsAdminUser]
     pagination_class = PageLimitPaginator
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = RecipeFilterSet
+
+    def get_queryset(self):
+        queryset = Recipe.objects.all()
+        params = self.request.query_params
+
+        is_favorited = params.get('is_favorited')
+        if is_favorited is not None and is_favorited == '1':
+            queryset = queryset.filter(favorite=self.request.user)
+
+        is_shopping_cart = params.get('is_in_shopping_cart')
+        if is_shopping_cart is not None and is_shopping_cart == '1':
+            queryset = queryset.filter(shopping_carts=self.request.user)
+
+        author_id = params.get('author')
+        if author_id is not None and User.objects.filter(pk=author_id).exists():
+            queryset = queryset.filter(author_id=author_id)
+
+
+        return queryset
 
     def get_serializer_class(self):
         if self.action in ('list', 'retrieve'):
