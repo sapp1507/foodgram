@@ -51,4 +51,4 @@ jobs:
         with:
           file: frontend/Dockerfile
           push: true
-          tags: sapp1507@foodgramm_front:latest
+          tags: sapp1507/foodgramm_front:latest
