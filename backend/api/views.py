@@ -22,6 +22,13 @@ from .serializers import (AddRecipeSerializer, IngredientSerializer,
 User = get_user_model()
 
 
+def _get_response(message, status_response):
+    return Response(
+        {'errors': message},
+        status_response
+    )
+
+
 class TagViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
@@ -79,8 +86,8 @@ class CreateDeleteMixin:
                 recipe, context={'request': request}
             )
             return Response(serializer.data, status.HTTP_201_CREATED)
-        return Response(
-            {'errors': f'Рецепт "{recipe.name}" уже добавлен'},
+        return _get_response(
+            f'Рецепт "{recipe.name}" уже добавлен',
             status.HTTP_400_BAD_REQUEST
         )
 
@@ -90,8 +97,9 @@ class CreateDeleteMixin:
         if queryset.filter(id=recipe.id).exists():
             queryset.remove(recipe)
             return Response(status=status.HTTP_204_NO_CONTENT)
-        return Response(
-            {'errors': f'Рецепта "{recipe.name}" нету в списке'}
+        return _get_response(
+            f'Рецепта "{recipe.name}" нету в списке',
+            status.HTTP_400_BAD_REQUEST
         )
 
 
@@ -154,7 +162,6 @@ class FavoriteViewSet(viewsets.ViewSet, CreateDeleteMixin):
 
 
 class AllSubscribedViewSet(ListViewSet):
-    # queryset = request.user.follower.all()
     serializer_class = UserRecipeSerializer
     permission_classes = [permissions.IsAuthenticated]
     pagination_class = PageLimitPaginator
@@ -170,13 +177,13 @@ class SubscribeViewSet(viewsets.ViewSet):
 
     def create(self, request, id_user):
         if id_user == request.user.id:
-            return self._get_response(
+            return _get_response(
                 'Нельзя подписаться на самого себя',
                 status.HTTP_400_BAD_REQUEST
             )
         author = get_object_or_404(User, pk=id_user)
         if request.user.follower.filter(author=author).exists():
-            return self._get_response(
+            return _get_response(
                 'Вы уже подписаны на этого автора',
                 status.HTTP_400_BAD_REQUEST
             )
@@ -190,7 +197,7 @@ class SubscribeViewSet(viewsets.ViewSet):
         author = get_object_or_404(User, pk=id_user)
 
         if not request.user.follower.filter(author=author).exists():
-            return self._get_response(
+            return _get_response(
                 'Вы не подписаны на этого автора',
                 status.HTTP_400_BAD_REQUEST
             )
