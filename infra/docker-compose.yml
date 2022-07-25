@@ -22,7 +22,7 @@ services:
   frontend:
     image: sapp1507/foodgram_frontend:latest
     volumes:
-      - frontend:/app/result_build/
+      - frontend:/app/build/
       - api_docs:/app/api/docs/
     depends_on:
       - nginx
@@ -38,9 +38,6 @@ services:
       - api_docs:/usr/share/nginx/html/api/docs/
       - static_value:/usr/share/nginx/html/static/:ro
       - media_value:/usr/share/nginx/html/media/:ro
-
-
-
 
 volumes:
   db:
