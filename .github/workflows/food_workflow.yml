@@ -68,7 +68,7 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           script: |
             sudo docker-compose stop
-            sudo docker-compose rm sapp_web_1
+            sudo docker container rm sapp_web_1
             sudo docker image rm sapp1507/foodgram_backend
             touch .env
             echo DJANGO_SECRET_KEY=${{ secrets.DJANGO_SECRET_KEY }} > .env
