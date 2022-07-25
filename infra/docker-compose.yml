@@ -8,7 +8,7 @@ services:
     env_file:
         - .env
 
-  backend:
+  web:
     image: sapp1507/foodgram_backend:latest
     restart: always
     volumes:
