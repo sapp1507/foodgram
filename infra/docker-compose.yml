@@ -12,7 +12,7 @@ services:
     image: sapp1507/foodgram_backend:latest
     restart: always
     volumes:
-      - static_value:/app/static/
+      - backend_static:/app/backend_static/
       - media_value:/app/media/
     depends_on:
       - db
@@ -22,7 +22,7 @@ services:
   frontend:
     image: sapp1507/foodgram_frontend:latest
     volumes:
-      - frontend:/app/html/
+      - ../frontend:/app/result_build/
       - api_docs:/app/api/docs/
 
   nginx:
@@ -32,16 +32,16 @@ services:
     volumes:
       - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf
-      - frontend:/usr/share/nginx/
+      - ../frontend/build:/usr/share/nginx/html/
       - api_docs:/usr/share/nginx/html/api/docs/
-      - static_value:/usr/share/nginx/html/static/:ro
+      - backend_static:/usr/share/nginx/html/backend_static/:ro
       - media_value:/usr/share/nginx/html/media/:ro
     depends_on:
       - web
 
 volumes:
   db:
-  static_value:
+  backend_static:
   media_value:
   frontend:
   api_docs:
