@@ -6,4 +6,4 @@ RUN npm install
 COPY frontend/ ./
 COPY docs/ ./api/docs/
 RUN npm run build
-CMD cp -r build result_build
+CMD cp -r build html
