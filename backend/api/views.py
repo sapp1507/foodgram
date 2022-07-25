@@ -14,7 +14,7 @@ from users.models import Subscription
 from .filters import IngredientSearchFilterBackend, RecipeFilterSet
 from .mixins import ListViewSet
 from .paginators import PageLimitPaginator
-from .permissions import IsAuthorOrReadOnly
+from .permissions import RecipesPermissions
 from .serializers import (AddRecipeSerializer, IngredientSerializer,
                           RecipeSerializer, SmallRecipeSerializer,
                           TagSerializer, UserRecipeSerializer)
@@ -39,7 +39,7 @@ class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
 
 class RecipeViewSet(viewsets.ModelViewSet):
     queryset = Recipe.objects.all()
-    permission_classes = [IsAuthorOrReadOnly, permissions.IsAdminUser]
+    permission_classes = [RecipesPermissions]
     pagination_class = PageLimitPaginator
     filter_backends = [DjangoFilterBackend]
     filterset_class = RecipeFilterSet
