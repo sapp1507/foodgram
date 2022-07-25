@@ -5,7 +5,10 @@ WORKDIR /app
 COPY backend/requirements.txt .
 
 RUN pip install -r ./requirements.txt --upgrade pip
-RUN pip install psycopg2-binary
+
+RUN apt-get update \
+    && apt-get -y install libpq-dev gcc \
+    && pip install psycopg2
 
 COPY backend/ .
 
