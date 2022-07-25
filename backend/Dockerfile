@@ -8,4 +8,4 @@ RUN pip install -r ./requirements.txt --no-cache-dir --upgrade pip
 
 COPY backend/ .
 
-CMD ["gunicorn", "backend.wsgi:application", "--bind", "0:0"]
+CMD ["gunicorn", "backend.wsgi:application", "--bind", "0:8000"]
