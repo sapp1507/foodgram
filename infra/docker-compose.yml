@@ -24,8 +24,6 @@ services:
     volumes:
       - frontend:/app/build/
       - api_docs:/app/api/docs/
-    depends_on:
-      - nginx
 
   nginx:
     image: nginx:1.19.3
