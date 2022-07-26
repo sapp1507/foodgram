@@ -83,6 +83,11 @@ class Recipe(models.Model):
     def __str__(self):
         return self.name
 
+    class Meta:
+        ordering = ['-pub_date']
+        verbose_name = 'Рецепт'
+        verbose_name_plural = 'Рецепты'
+
 
 class AmountIngredient(models.Model):
     """Рецепты и ингредиенты, многие ко многим"""
