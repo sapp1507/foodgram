@@ -26,6 +26,10 @@ class Tag(models.Model):
     def __str__(self):
         return self.name
 
+    class Meta:
+        verbose_name = 'Тэг'
+        verbose_name_plural = 'Тэги'
+
 
 class Ingredient(models.Model):
     """Ингридиенты и их единица измерения"""
