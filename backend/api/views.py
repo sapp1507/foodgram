@@ -2,13 +2,12 @@ import io
 
 from django.contrib.auth import get_user_model
 from django.db.models import F
-from django.http import FileResponse, HttpResponse
+from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
+from recipes.models import Ingredient, Recipe, Tag
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
-
-from recipes.models import Ingredient, Recipe, Tag
 from reportlab.pdfgen import canvas
 from rest_framework import permissions, status, viewsets
 from rest_framework.response import Response
@@ -111,10 +110,6 @@ class ShoppingCartViewSet(viewsets.ViewSet, CreateDeleteMixin):
     permission_classes = [permissions.IsAuthenticated]
 
     def get_pdf(self, request):
-        buffer = io.BytesIO()
-
-        pdf = canvas.Canvas(buffer)
-
         user = request.user
 
         ingredients = user.shopping_cart.all().values(
