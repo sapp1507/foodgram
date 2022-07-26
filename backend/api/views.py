@@ -149,7 +149,7 @@ class ShoppingCartViewSet(viewsets.ViewSet, CreateDeleteMixin):
         height = 760
         for i, (name, data) in enumerate(print_ingredients.items(), 1):
             page.drawString(55, height, (f'{i}. {name} - {data["amount"]} '
-                                         f'{data["measurement_unit"]}'))
+                                         f'{data["unit"]}'))
             height -= 30
         page.showPage()
         page.save()
