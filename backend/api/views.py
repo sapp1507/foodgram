@@ -136,7 +136,7 @@ class ShoppingCartViewSet(viewsets.ViewSet, CreateDeleteMixin):
 
         pdfmetrics.registerFont(TTFont(
             'Arkhip',
-            'data/arkhip_font.ttf',
+            'backend/data/arkhip_font.ttf',
             'UTF-8'
         ))
 
