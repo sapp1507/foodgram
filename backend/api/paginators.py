@@ -5,7 +5,3 @@ class PageLimitPaginator(PageNumberPagination):
     page_size = 6
     page_size_query_param = 'limit'
     max_page_size = 10
-
-
-class SubscribedPaginator(PageNumberPagination):
-    page_size = 6
