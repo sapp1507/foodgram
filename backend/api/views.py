@@ -1,6 +1,8 @@
+import io
+
 from django.contrib.auth import get_user_model
 from django.db.models import F
-from django.http import HttpResponse
+from django.http import FileResponse
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from recipes.models import Ingredient, Recipe, Tag
@@ -138,11 +140,9 @@ class ShoppingCartViewSet(viewsets.ViewSet, CreateDeleteMixin):
             'UTF-8'
         ))
 
-        response = HttpResponse(wishlist, content_type='application/pdf')
-        response['Content-Disposition'] = ('attachment; '
-                                           'filename="shopping_list.pdf"')
+        buffer = io.BytesIO()
 
-        page = canvas.Canvas(response)
+        page = canvas.Canvas(buffer)
         page.setFont('Arkhip', size=32)
         page.drawString(200, 800, 'Список покупок')
         page.setFont('Arkhip', size=18)
@@ -153,7 +153,10 @@ class ShoppingCartViewSet(viewsets.ViewSet, CreateDeleteMixin):
             height -= 30
         page.showPage()
         page.save()
-        return response
+        buffer.seek(0)
+        return FileResponse(
+            buffer, as_attachment=True, filename='Список покупок.pdf'
+        )
 
     def create(self, request, id_recipe):
         attribute = 'shopping_cart'
