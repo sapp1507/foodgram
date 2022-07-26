@@ -62,7 +62,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
         is_shopping_cart = params.get('is_in_shopping_cart')
         if is_shopping_cart is not None and is_shopping_cart == '1':
-            queryset = queryset.filter(shopping_carts=self.request.user)
+            queryset = queryset.filter(shopping_carts__id=self.request.user.id)
 
         author_id = params.get('author')
         if author_id is not None and User.objects.filter(
