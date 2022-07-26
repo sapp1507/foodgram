@@ -2,9 +2,12 @@ import io
 
 from django.contrib.auth import get_user_model
 from django.db.models import F
-from django.http import FileResponse
+from django.http import FileResponse, HttpResponse
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
+from reportlab.pdfbase import pdfmetrics
+from reportlab.pdfbase.ttfonts import TTFont
+
 from recipes.models import Ingredient, Recipe, Tag
 from reportlab.pdfgen import canvas
 from rest_framework import permissions, status, viewsets
@@ -130,15 +133,34 @@ class ShoppingCartViewSet(viewsets.ViewSet, CreateDeleteMixin):
                     'amount': ingredient['_amount'],
                     'unit': ingredient['_unit']
                 }
-
+        wishlist = []
         for key, value in print_ingredients.items():
-            pdf.drawString(100, 100, f'{key}: {value["amount"]} '
-                                     f'{value["unit"]}')
-        pdf.showPage()
-        pdf.save()
-        buffer.seek(0)
-        return FileResponse(
-            buffer, as_attachment=True, filename='Список покупок.pdf')
+            wishlist.append(
+                f'{key}: {value["amount"]} {value["unit"]}'
+            )
+
+        pdfmetrics.registerFont(TTFont(
+            'Arkhip',
+            'data/arkhip_font.ttf',
+            'UTF-8'
+        ))
+
+        response = HttpResponse(wishlist, content_type='application/pdf')
+        response['Content-Disposition'] = ('attachment; '
+                                           'filename="shopping_list.pdf"')
+
+        page = canvas.Canvas(response)
+        page.setFont('Arkhip', size=32)
+        page.drawString(200, 800, 'Список покупок')
+        page.setFont('Arkhip', size=18)
+        height = 760
+        for i, (name, data) in enumerate(print_ingredients.items(), 1):
+            page.drawString(55, height, (f'{i}. {name} - {data["amount"]} '
+                                         f'{data["measurement_unit"]}'))
+            height -= 30
+        page.showPage()
+        page.save()
+        return response
 
     def create(self, request, id_recipe):
         attribute = 'shopping_cart'
