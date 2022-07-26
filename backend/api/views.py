@@ -1,5 +1,3 @@
-import io
-
 from django.contrib.auth import get_user_model
 from django.db.models import F
 from django.http import HttpResponse
