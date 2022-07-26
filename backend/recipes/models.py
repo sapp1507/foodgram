@@ -56,8 +56,7 @@ class Recipe(models.Model):
     )
     image = models.ImageField(
         'Фото',
-        upload_to='recipes/',
-        blank=True,
+        upload_to='recipes/images/'
     )
     text = models.TextField(verbose_name='Описание')
     cooking_time = models.IntegerField(verbose_name='Время готовки')
@@ -66,6 +65,10 @@ class Recipe(models.Model):
         User, related_name='favorite', blank=True)
     shopping_carts = models.ManyToManyField(
         User, related_name='shopping_cart', blank=True)
+    pub_date = models.DateTimeField(
+        'Дата публикации',
+        auto_now_add=True,
+    )
 
     def favorite_count(self):
         return self.favorite.count()
