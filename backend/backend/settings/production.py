@@ -6,7 +6,7 @@ from .base import *
 
 load_dotenv()
 
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS += [
     'sapp.tk',
