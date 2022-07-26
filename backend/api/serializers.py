@@ -122,9 +122,8 @@ class AddRecipeSerializer(RecipeSerializer):
 
     class Meta:
         model = Recipe
-        fields = ['id', 'tags', 'author', 'ingredients',
-                  'is_favorited', 'is_shopping_cart', 'name', 'image',
-                  'text', 'cooking_time']
+        fields = ['id', 'tags', 'ingredients', 'name', 'image', 'text',
+                  'cooking_time']
 
     def validate(self, attrs):
         request = self.context['request']
