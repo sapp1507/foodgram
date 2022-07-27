@@ -126,10 +126,13 @@ class AddRecipeSerializer(RecipeSerializer):
             return attrs
 
         for ingredient in request.data['ingredients']:
-            if request.data['ingredients'].count(ingredient) > 1:
-                raise serializers.ValidationError(
-                    {'ingredients': f'Ингредиент: {ingredient["name"]} '
-                                    f'повторяется'})
+            count = 0
+            for find_ingredient in request.data['ingredients']:
+                if ingredient['id'] == find_ingredient['id']:
+                    count += 1
+                if count > 1:
+                    raise serializers.ValidationError(
+                        {'ingredients': 'Есть повторяющиеся ингредиенты'})
 
             if not Ingredient.objects.filter(id=ingredient['id']).exists():
                 raise serializers.ValidationError(
