@@ -20,7 +20,6 @@ class RecipeAdmin(admin.ModelAdmin):
     search_fields = ['author', 'name']
     inlines = [RecipeIngredientsInLine]
     readonly_fields = ['favorite_count']
-    # filter_horizontal = ['tags']
     fields = ['author', 'name', 'image', 'text', 'cooking_time', 'tags',
               'favorite_count', 'favorite', 'shopping_carts']
 

@@ -11,6 +11,5 @@ class RecipesPermissions(BasePermission):
         if view.action == 'retrieve':
             return True
         if view.action in ['partial_update', 'destroy']:
-            if request.user == obj.author or request.user.is_superuser:
-                return True
+            return request.user == obj.author or request.user.is_superuser
         return False

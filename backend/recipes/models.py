@@ -23,12 +23,12 @@ class Tag(models.Model):
         validators=[validate_slug],
     )
 
-    def __str__(self):
-        return self.name
-
     class Meta:
         verbose_name = 'Тэг'
         verbose_name_plural = 'Тэги'
+
+    def __str__(self):
+        return self.name
 
 
 class Ingredient(models.Model):
@@ -42,12 +42,12 @@ class Ingredient(models.Model):
         verbose_name='Ед. изм.'
     )
 
-    def __str__(self):
-        return f'{self.name} {self.measurement_unit}'
-
     class Meta:
         verbose_name = 'Ингредиент'
         verbose_name_plural = 'Ингредиенты'
+
+    def __str__(self):
+        return f'{self.name} {self.measurement_unit}'
 
 
 class Recipe(models.Model):
@@ -78,6 +78,14 @@ class Recipe(models.Model):
         auto_now_add=True,
     )
 
+    class Meta:
+        ordering = ['-pub_date']
+        verbose_name = 'Рецепт'
+        verbose_name_plural = 'Рецепты'
+
+    def __str__(self):
+        return self.name
+
     def favorite_count(self):
         return self.favorite.count()
     favorite_count.short_description = 'Добавили в избранное'
@@ -87,14 +95,6 @@ class Recipe(models.Model):
 
     def get_ingredients(self):
         return self.ingredients.all()
-
-    def __str__(self):
-        return self.name
-
-    class Meta:
-        ordering = ['-pub_date']
-        verbose_name = 'Рецепт'
-        verbose_name_plural = 'Рецепты'
 
 
 class AmountIngredient(models.Model):
@@ -106,7 +106,15 @@ class AmountIngredient(models.Model):
     )
     ingredient = models.ForeignKey(
         Ingredient,
-        related_name='recipes',
+        related_name='ingredient_count',
         on_delete=models.CASCADE,
     )
     amount = models.PositiveIntegerField()
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                name='unique_amount_ingredients',
+                fields=['recipe', 'ingredient']
+            )
+        ]

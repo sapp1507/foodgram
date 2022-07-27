@@ -1,19 +1,14 @@
-from django.contrib.auth import get_user_model
 from django.contrib.auth.password_validation import validate_password
 from django.core import exceptions as django_exceptions
 from django.shortcuts import get_object_or_404
 from djoser.serializers import UserCreateSerializer
 from drf_extra_fields.fields import Base64ImageField
-from recipes.models import AmountIngredient, Ingredient, Recipe, Tag
 from rest_framework import serializers
 
-from .utils import clear_ingredients_in_recipe
+from recipes.models import AmountIngredient, Ingredient, Recipe, Tag
+from users.models import User
 
-User = get_user_model()
-
-
-def _is_authenticated(context):
-    return context['request'].user.is_authenticated
+from .utils import clear_ingredients_in_recipe, is_authenticated
 
 
 class TagSerializer(serializers.ModelSerializer):
@@ -56,7 +51,7 @@ class UserSerializer(serializers.ModelSerializer):
                   'is_subscribed']
 
     def get_is_subscribed(self, obj):
-        if _is_authenticated(self.context):
+        if is_authenticated(self.context):
             return obj.following.filter(
                 user=self.context['request'].user).exists()
         return False
@@ -71,8 +66,8 @@ class UserCustomCreateSerializer(UserCreateSerializer):
         user = User(**attrs)
         password = attrs.get('password')
 
-        if user.username == 'me':
-            raise serializers.ValidationError('username <me> не доступен')
+        if user.username.lower() == 'me':
+            raise serializers.ValidationError('username \"me\" не доступен')
 
         try:
             validate_password(password, user)
@@ -98,14 +93,14 @@ class RecipeSerializer(serializers.ModelSerializer):
                   'text', 'cooking_time']
 
     def get_is_favorited(self, obj):
-        if _is_authenticated(self.context):
+        if is_authenticated(self.context):
             return obj.favorite.filter(
                 id=self.context['request'].user.id
             ).exists()
         return False
 
     def get_is_in_shopping_cart(self, obj):
-        if _is_authenticated(self.context):
+        if is_authenticated(self.context):
             return obj.shopping_carts.filter(
                 id=self.context['request'].user.id
             ).exists()
@@ -129,16 +124,18 @@ class AddRecipeSerializer(RecipeSerializer):
         request = self.context['request']
         if request.method != 'POST':
             return attrs
+
         for ingredient in request.data['ingredients']:
+            if request.data['ingredients'].count(ingredient) > 1:
+                raise serializers.ValidationError(
+                    {'ingredients': f'Ингредиент: {ingredient["name"]} '
+                                    f'повторяется'})
+
             if not Ingredient.objects.filter(id=ingredient['id']).exists():
                 raise serializers.ValidationError(
-                    {
-                        'ingredients': f'Недопустимый первичный ключ '
-                                       f'{ingredient["id"]} - объект не '
-                                       f'существует'
-                    }
-
-                )
+                    {'ingredients': f'Недопустимый первичный ключ '
+                                    f'{ingredient["id"]} - объект не '
+                                    f'существует'})
         return attrs
 
     def _take_validate_data(self, data):
@@ -147,13 +144,13 @@ class AddRecipeSerializer(RecipeSerializer):
         return tags, ingredients
 
     def _create_amount_for_recipe(self, ingredients, recipe):
-        for _ in ingredients:
-            ingredient = get_object_or_404(Ingredient,
-                                           pk=_['ingredient']['id'])
+        for ingredient in ingredients:
+            add_ingredient = get_object_or_404(
+                Ingredient, pk=ingredient['ingredient']['id'])
             amount, created = AmountIngredient.objects.get_or_create(
                 recipe=recipe,
-                ingredient=ingredient,
-                amount=_['amount']
+                ingredient=add_ingredient,
+                amount=ingredient['amount']
             )
             if created:
                 amount.save()
