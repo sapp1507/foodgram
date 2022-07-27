@@ -21,6 +21,7 @@ jobs:
 
       - name: Test with flake8
         run: |
+          cd backend
           python -m flake8
 
   build_and_deploy_to_docker_hub:
