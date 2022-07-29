@@ -60,7 +60,8 @@ class ShoppingCartViewSet(viewsets.ViewSet, CreateDeleteMixin):
 
         queryset = Ingredient.objects.filter(
             ingredient_count__recipe__in=recipes
-        ).annotate(count=(Sum('ingredient_count__amount')))
+        ).values('name', 'measurement_unit').annotate(
+            count=(Sum('ingredient_count__amount')))
 
         pdfmetrics.registerFont(TTFont(
             'Arkhip',
@@ -80,8 +81,8 @@ class ShoppingCartViewSet(viewsets.ViewSet, CreateDeleteMixin):
             page.drawString(
                 55,
                 height,
-                f'{i}. {ingredient.name}: {ingredient.count} '
-                f'{ingredient.measurement_unit}'
+                f'{i}. {ingredient["name"]}: {ingredient["count"]} '
+                f'{ingredient["measurement_unit"]}'
             )
             height -= 30
 
