@@ -80,7 +80,7 @@ class ShoppingCartViewSet(viewsets.ViewSet, CreateDeleteMixin):
             page.drawString(
                 55,
                 height,
-                f'{ingredient.name}: {ingredient.count} '
+                f'{i}. {ingredient.name}: {ingredient.count} '
                 f'{ingredient.measurement_unit}'
             )
             height -= 30

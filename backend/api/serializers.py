@@ -5,10 +5,9 @@ from djoser.serializers import UserCreateSerializer
 from drf_extra_fields.fields import Base64ImageField
 from rest_framework import serializers
 
+from api.utils import clear_ingredients_in_recipe, is_authenticated
 from recipes.models import AmountIngredient, Ingredient, Recipe, Tag
 from users.models import User
-
-from .utils import clear_ingredients_in_recipe, is_authenticated
 
 
 class TagSerializer(serializers.ModelSerializer):
@@ -125,16 +124,17 @@ class AddRecipeSerializer(RecipeSerializer):
         if request.method != 'POST':
             return attrs
 
-        for ingredient in request.data['ingredients']:
-            count = 0
-            for find_ingredient in request.data['ingredients']:
-                if ingredient['id'] == find_ingredient['id']:
-                    count += 1
-                if count > 1:
-                    raise serializers.ValidationError(
-                        {'ingredients': 'Есть повторяющиеся ингредиенты'})
+        check_id = []
 
-            if not Ingredient.objects.filter(id=ingredient['id']).exists():
+        for ingredient in attrs['ingredients']:
+            if ingredient['ingredient']['id'] in check_id:
+                raise serializers.ValidationError(
+                    {'ingredients': 'Есть повторяющиеся ингредиенты'})
+
+            check_id.append(ingredient['ingredient']['id'])
+
+            if not Ingredient.objects.filter(
+                    id=ingredient['ingredient']['id']).exists():
                 raise serializers.ValidationError(
                     {'ingredients': f'Недопустимый первичный ключ '
                                     f'{ingredient["id"]} - объект не '
