@@ -210,9 +210,11 @@ class UserRecipeSerializer(UserSerializer):
     def get_recipes(self, author):
         request = self.context.get('request')
         recipes_limit = request.GET.get('recipes_limit')
-        queryset = Recipe.objects.filter(author=author)
         if recipes_limit is not None and int(recipes_limit) > 0:
             queryset = Recipe.objects.filter(
                 author=author
             )[:int(recipes_limit)]
+        else:
+            queryset = Recipe.objects.filter(author=author)
+
         return SmallRecipeSerializer(queryset, many=True, read_only=True).data
