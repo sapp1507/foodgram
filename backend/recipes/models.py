@@ -66,7 +66,7 @@ class Recipe(models.Model):
         upload_to='recipes/images/'
     )
     text = models.TextField(verbose_name='Описание')
-    cooking_time = models.IntegerField(verbose_name='Время готовки')
+    cooking_time = models.PositiveIntegerField(verbose_name='Время готовки')
     tags = models.ManyToManyField(Tag, verbose_name='Тэг')
     favorite = models.ManyToManyField(
         User, related_name='favorite', blank=True)

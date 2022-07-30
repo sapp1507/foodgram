@@ -126,6 +126,12 @@ class AddRecipeSerializer(RecipeSerializer):
 
         check_id = []
 
+        if int(attrs['cooking_time']) < 1:
+            raise serializers.ValidationError(
+                {'cooking_time': ('Время готовки не может быть меньше или '
+                                  'ровно 0')}
+            )
+
         for ingredient in attrs['ingredients']:
             if ingredient['ingredient']['id'] in check_id:
                 raise serializers.ValidationError(
@@ -190,7 +196,7 @@ class SmallRecipeSerializer(serializers.ModelSerializer):
 
 
 class UserRecipeSerializer(UserSerializer):
-    recipes = SmallRecipeSerializer(read_only=True, many=True)
+    recipes = serializers.SerializerMethodField()
     recipes_count = serializers.SerializerMethodField()
 
     class Meta:
@@ -200,3 +206,13 @@ class UserRecipeSerializer(UserSerializer):
 
     def get_recipes_count(self, author):
         return author.recipes.count()
+
+    def get_recipes(self, author):
+        request = self.context.get('request')
+        recipes_limit = request.GET.get('recipes_limit')
+        queryset = Recipe.objects.filter(author=author)
+        if recipes_limit is not None and int(recipes_limit) > 0:
+            queryset = Recipe.objects.filter(
+                author=author
+            )[:int(recipes_limit)]
+        return SmallRecipeSerializer(queryset, many=True, read_only=True).data

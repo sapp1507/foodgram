@@ -121,8 +121,7 @@ class AllSubscribedViewSet(ListViewSet):
     pagination_class = PageLimitPaginator
 
     def get_queryset(self):
-        return User.objects.filter(
-            following__user=self.request.user)
+        return User.objects.filter(following__user=self.request.user)
 
 
 class SubscribeViewSet(viewsets.ViewSet):
